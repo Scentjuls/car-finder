@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+    <head> 
+        <meta charset="utf-8">
+        <title></title>
+        <link rel="stylesheet" href="/index.css" type="text/css"/>
+        <link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet">
+    </head>
+    <body>
+        <h1 class="title">Car Tracker</h1>
+        <div id="homepage">
+            <h1>Find a car in your area</h1>
+            <div id="cars"></div>
+        </div>
+        <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+        <script src="https://unpkg.com/react@15/dist/react.js"></script>
+        <script src="https://unpkg.com/react-dom@15/dist/react-dom.min.js"></script>
+
+         <!-- Create React component-->
+    <script type="text/babel">
+    
+        var Cars = React.createClass({
+            getInitialState: function(){
+                return ({
+                    cars: []
+                });
+            },
+            render:function(){
+                var cars = this.state.cars;
+                cars =  cars.map(function(car, app){
+                    return(
+                        <li key={app}>
+                            <span className={car.available}></span>
+                            <span className="Name">{car.name}</span>
+                            <span className="model">{car.model}</span>
+                            <span className="dist">{Math.floor(car.dist.calculated/1000)} km </span>
+                        </li>    
+                    );
+                });
+                return(
+                    <div id="car-container">
+                        <form id="search" onSubmit={this.handleSubmit}>
+                            <label> Enter your longitude: </label>
+                            <input type="text" ref="lng" placeholder="longitude" required />
+                            <label> Enter your latitude: </label>
+                            <input type="text" ref="lat" placeholder="latitude" required/>
+                            <input type="submit" value="find cars" />
+                        </form>
+                        <ul>{cars}</ul>
+                    </div>
+                );
+            },
+            handleSubmit(e){
+                e.preventDefault();
+                var lng = this.refs.lng.value;
+                var lat = this.refs.lat.value;
+    
+                fetch('/api/cars?lng=' + lng + '&lat=' + lat)
+                .then(res => res.json())
+                .then(res => {
+                    if(res.length == 0) {
+                        alert("No cars available")
+                    }
+                    else {
+                        this.setState({
+                            cars: res
+                   })
+                    }
+                   console.log(res)
+                })
+            }
+        });
+        ReactDOM.render(<Cars/>, document.getElementById('cars'));
+        </script>
+    </body>
+</html>
